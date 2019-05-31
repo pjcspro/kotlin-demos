@@ -4,16 +4,46 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import pro.pjcs.kotlindemos.base.BaseActivity
-import pro.pjcs.kotlindemos.models.DemoInfo
+import pro.pjcs.kotlindemos.models.Filter
+import pro.pjcs.kotlindemos.models.User
+
 
 class ListsActivity : BaseActivity() {
+
+    private lateinit var filter         : Filter
+    private lateinit var data           : List<Any>
+    private lateinit var filteredData   : List<Any>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val complexity = intent.getIntExtra(INTENT_COMPLEXITY, 0);
-        Log.v(TAG, "Complexity is $complexity")
+        filter  = intent.getSerializableExtra(INTENT_FILTER) as Filter
+
+        val dataJson = intent.getStringExtra(INTENT_DATA) as String
+        val listType = object : TypeToken<List<User>>() { }.type
+        data = Gson().fromJson<List<User>>(dataJson, listType)
+
+        performFilter()
+    }
+
+
+    private fun performFilter(){
+
+        if(!::data.isInitialized){
+            return
+        }
+
+        if(!::filter.isInitialized ) {
+            filteredData = data
+            return
+        }
+
+        filteredData = data.filter { filter.validates(it) }
+
+        Log.v(TAG, "Filtered data: "+Gson().toJson(filteredData))
 
     }
 
@@ -21,10 +51,12 @@ class ListsActivity : BaseActivity() {
 }
 
 //- Creates a new Intent to be passed to StartActivity
-private const val INTENT_COMPLEXITY = "INTENT_COMPLEXITY"
-fun Context.ListActivityIntent(info: DemoInfo) : Intent {
+private const val INTENT_FILTER = "INTENT_FILTER"
+private const val INTENT_DATA   = "INTENT_DATA"
+fun Context.listActivityIntent(filter: Filter, data: ArrayList<Any>) : Intent {
     return Intent(this, ListsActivity::class.java).apply {
-        putExtra(INTENT_COMPLEXITY, info.complexity)
+        putExtra(INTENT_FILTER, filter)
+        putExtra(INTENT_DATA, Gson().toJson(data))
     }
 }
 
