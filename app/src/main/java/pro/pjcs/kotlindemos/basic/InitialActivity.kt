@@ -6,7 +6,6 @@ import pro.pjcs.kotlindemos.R
 import pro.pjcs.kotlindemos.base.BaseActivity
 import pro.pjcs.kotlindemos.models.Filter
 import pro.pjcs.kotlindemos.models.FilterParams
-import pro.pjcs.kotlindemos.models.FilterType
 import pro.pjcs.kotlindemos.models.User
 
 
@@ -21,12 +20,18 @@ class InitialActivity : BaseActivity() {
         welcome_message.text = "Welcome to Kotlin Demos"
 
         val data : ArrayList<Any> = arrayListOf(
-            User("1", "Dona", "Odeti", 15),
+            User("1", "Dona", "Odeti", 19),
             User("2", "John", "Second", 45)
         )
 
 
-        val filter = Filter(listOf(FilterParams(User::firstName.name, FilterType.EQUALS, "Dona")))
+        val name = "Dona";
+        val maxAge = 30;
+        val filter1 = FilterParams<User>{ obj -> obj.age?.let { it < maxAge }?:false }
+        val filter2 = FilterParams<User>{ obj -> obj.firstName == name }
+
+
+        val filter = Filter(listOf(filter1, filter2))
 
         button_open_lists.setOnClickListener { startActivity( listActivityIntent(filter, data) ) }
 

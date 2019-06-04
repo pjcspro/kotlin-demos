@@ -1,24 +1,20 @@
 package pro.pjcs.kotlindemos.models
 
-import pro.pjcs.kotlindemos.base.getFieldWithName
 import java.io.Serializable
 
 //TODO: Migrate to parcelable
-class Filter(val filters: List<FilterParams>) : Serializable {
+class Filter<T>(private val filters: List<FilterParams<T>>) : Serializable {
 
     var active = true
 
-    fun validates(obj: Any) : Boolean {
+    fun validates(obj: T) : Boolean {
 
         filters.forEach { filter ->
 
-            val fieldValue = obj.getFieldWithName(filter.field)
-                ?: throw Exception("Invalid field name on filter") //TODO: custom exception class
+            //val fieldValue = obj.getFieldWithName(filter.field)
+             //   ?: throw Exception("Invalid field name on filter") //TODO: custom exception class
 
-            when( filter.compareOperator ) {
-                FilterType.EQUALS -> return fieldValue == filter.againstValue
-                //TODO: Other Filter types
-            }
+            return filter.compareOperator(obj)
 
         }
 
@@ -28,5 +24,4 @@ class Filter(val filters: List<FilterParams>) : Serializable {
 
 }
 
-enum class FilterType { EQUALS, GREATER_THAN, LESS_THAN }
-data class FilterParams(val field: String, val compareOperator: FilterType, val againstValue: String? = null) : Serializable
+data class FilterParams<T>(val compareOperator: (T) -> Boolean) : Serializable

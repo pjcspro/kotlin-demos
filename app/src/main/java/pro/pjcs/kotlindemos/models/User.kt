@@ -13,5 +13,4 @@ import kotlinx.android.parcel.Parcelize
 class User(val userID : String, val firstName : String, val lastName : String, val age : Int?) : Parcelable {
 
 
-
 }
