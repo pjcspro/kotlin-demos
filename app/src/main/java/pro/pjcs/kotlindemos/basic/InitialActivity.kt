@@ -34,7 +34,7 @@ class InitialActivity : BaseActivity() {
         val filter = Filter(listOf(filter1, filter2))
 
         button_open_lists.setOnClickListener { startActivity( listActivityIntent(filter, data) ) }
-
+        button_open_asyncs.setOnClickListener { startActivity( asyncTasksActivity() ) }
 
     }
 
